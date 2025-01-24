@@ -1,95 +1,84 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+'use client'
+import { useState } from 'react';
 
-export default function Home() {
+import styles from './page.module.css';
+import players from './constants/players';
+
+import createBattingOrder from './utils/createBattingOrder';
+import createFieldingChart from './utils/createFieldingChart';
+// import generatePlayerChart from './utils/generatePlayerChart';
+import PlayerChart from './components/PlayerChart';
+const Home = () => {
+    const [playerChart, setPlayerChart] = useState();
+    const [error, setError] = useState();
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Define an asynchronous function to send POST request to our api
+    const generateBattingOrder = async () => {
+        setIsLoading(true);
+        try {
+            // use the fetch method to send an http request to /api/generate endpoint
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ body: players }),
+            });
+
+            // Waits for the response to be converted to JSON format and stores it in the data variable
+            const data = await response.json();
+
+            //  If successful, updates the output state with the output field from the response data
+            if (response.ok) {
+                setPlayerChart(data.output);
+            } else {
+                setError(data.error);
+            }
+            setIsLoading(false);
+
+            // Catches any errors that occur during the fetch request
+        } catch (error) {
+            console.error('Error:', error);
+            setIsLoading(false);
+            setError('An error occurred. Please try again later.');
+        }
+    }
+
+    const getBattingOrder = async () => {
+        setIsLoading(true);
+        setPlayerChart();
+        // Create batting order and fielding chart
+        const batting = createBattingOrder(players);
+
+        if (batting?.length > 0) {
+            const fieldingChart = createFieldingChart(batting);
+
+            if (fieldingChart?.length > 0) {
+                setPlayerChart(fieldingChart);
+            }
+        }
+        setIsLoading(false);
+    };
+
     return (
         <main className={styles.main}>
-            <div className={styles.description}>
-                <p>
-                    Get started by editing&nbsp;
-                    <code className={styles.code}>src/app/page.js</code>
-                </p>
-                <div>
-                    <a
-                        href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        By{' '}
-                        <Image
-                            src="/vercel.svg"
-                            alt="Vercel Logo"
-                            className={styles.vercelLogo}
-                            width={100}
-                            height={24}
-                            priority
-                        />
-                    </a>
-                </div>
+            <div className={styles.buttonContainer}>
+                <button onClick={getBattingOrder} className={styles.button}>
+                    Get Batting Order
+                </button>
+
+                <button onClick={generateBattingOrder} className={styles.button}>
+                    Generate Batting Order
+                </button>
             </div>
+            {isLoading && <p>Generating Batting Order...</p>}
+            {error && <p className={styles.error}>{error}</p>}
 
-            <div className={styles.center}>
-                <Image
-                    className={styles.logo}
-                    src="/next.svg"
-                    alt="Next.js Logo"
-                    width={180}
-                    height={37}
-                    priority
-                />
-            </div>
-
-            <div className={styles.grid}>
-                <a
-                    href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                    className={styles.card}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <h2>
-                        Docs <span>-&gt;</span>
-                    </h2>
-                    <p>Find in-depth information about Next.js features and API.</p>
-                </a>
-
-                <a
-                    href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                    className={styles.card}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <h2>
-                        Learn <span>-&gt;</span>
-                    </h2>
-                    <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-                </a>
-
-                <a
-                    href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                    className={styles.card}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <h2>
-                        Templates <span>-&gt;</span>
-                    </h2>
-                    <p>Explore the Next.js 13 playground.</p>
-                </a>
-
-                <a
-                    href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                    className={styles.card}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <h2>
-                        Deploy <span>-&gt;</span>
-                    </h2>
-                    <p>
-                        Instantly deploy your Next.js site to a shareable URL with Vercel.
-                    </p>
-                </a>
-            </div>
+            {!error && <PlayerChart playerChart={playerChart} />}
         </main>
     )
 }
+
+
+export default Home;
