@@ -12,9 +12,9 @@
         "@google-ai/generativelanguage": "^2.9.0",
         "@google/generative-ai": "^0.21.0",
         "eslint": "8.42.0",
-        "eslint-config-next": "13.4.4",
-        "next": "13.4.4",
-        "react": "18.2.0",
-        "react-dom": "18.2.0"
+        "eslint-config-next": "^15.1.6",
+        "next": "^15.1.6",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0"
     }
 }
