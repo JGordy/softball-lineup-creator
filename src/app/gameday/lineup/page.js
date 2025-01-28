@@ -1,18 +1,40 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import styles from '../../styles/page.module.css';
 import lineupStyles from './lineup.module.css';
-import players from '../../constants/players';
 
 import createBattingOrder from '../../utils/createBattingOrder';
 import createFieldingChart from '../../utils/createFieldingChart';
 import PlayerChart from '../../components/PlayerChart';
 
 const GameDay = () => {
+    const [players, setPlayers] = useState();
     const [playerChart, setPlayerChart] = useState();
     const [error, setError] = useState();
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchPlayers = async () => {
+            try {
+                const response = await fetch('/players.json', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                setPlayers(data.players);
+            } catch (error) {
+                console.error('Error:', error);
+                setError('An error occurred. Please try again later.');
+            }
+        };
+
+        if (!players) {
+            fetchPlayers();
+        };
+    }, []);
 
     // Define an asynchronous function to send POST request to our api
     const generateBattingOrder = async () => {
