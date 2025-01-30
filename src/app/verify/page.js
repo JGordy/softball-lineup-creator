@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-import { account } from "./appwrite";
+import { account } from "../appwrite";
+
+import styles from '../styles/page.module.css';
 
 const VerifyPage = () => {
     const searchParams = useSearchParams();
