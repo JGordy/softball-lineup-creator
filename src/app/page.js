@@ -28,9 +28,10 @@ const LoginPage = () => {
         const { email, password } = formData;
         try {
             await account.create(ID.unique(), email, password, name);
-            const verificationSent = await account.createVerification('localhost:3000/verify');
+            await login(email, password);
+
+            const verificationSent = await account.createVerification('http://localhost:3000/verify');
             console.log({ verificationSent });
-            login(email, password);
         } catch (error) {
             console.log(error);
         }
