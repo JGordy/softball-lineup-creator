@@ -30,8 +30,7 @@ const LoginPage = () => {
             await account.create(ID.unique(), email, password, name);
             await login(email, password);
 
-            const verificationSent = await account.createVerification('http://localhost:3000/verify');
-            console.log({ verificationSent });
+            await account.createVerification('http://localhost:3000/verify');
         } catch (error) {
             console.log(error);
         }
@@ -44,7 +43,6 @@ const LoginPage = () => {
 
     const handleInputChange = (e) => {
         const { type, value } = e.target;
-        console.log({ type, value });
 
         if (type === "text") {
             setName(value);
