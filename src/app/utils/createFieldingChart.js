@@ -1,112 +1,96 @@
 import positions from "../constants/positions";
 
-function countOutPositions(player) {
+// Add helper function to count "Out" positions
+const countOutPositions = (player) => {
     return player.positions.filter(pos => pos === "Out").length;
-}
+};
 
-function hasReachedOutLimit(player, playerCount) {
-    const maxOuts = playerCount > 12 ? 2 : 1;
-    return countOutPositions(player) >= maxOuts;
-}
-
-function getUnassignedPlayers(players, inning) {
-    return players.filter(player => !player.positions[inning]);
-}
-
-function getUnfilledPositions(players, inning, allPositions) {
-    const filledPositions = new Set(players.map(p => p.positions[inning]).filter(Boolean));
-    return allPositions.filter(pos => pos !== "Out" && !filledPositions.has(pos));
-}
-
-function assignPlayerToPosition(player, position, inning, playerCount) {
-    if (!player.positions[inning]) {
-        if (position === "Out" && hasReachedOutLimit(player, playerCount)) {
-            return false;
+const assignPosition = (player, availablePositions) => {
+    for (let preferredPosition of player.preferredPositions) {
+        if (availablePositions.includes(preferredPosition)) {
+            player.positions.push(preferredPosition);
+            return { assignedPlayer: player.name, assignedPosition: preferredPosition };
         }
-        player.positions[inning] = position;
-        return true;
     }
-    return false;
-}
 
-function createFieldingChart(players, innings = 7) {
-    const playerData = players.map(player => ({
-        ...player,
-        positions: new Array(innings).fill(null)
-    }));
+    // Fallback if no preferred position is available
+    if (availablePositions.length > 0) {
+        const fallbackPosition = availablePositions[0];
+        player.positions.push(fallbackPosition);
+        return { assignedPlayer: player.name, assignedPosition: fallbackPosition };
+    }
 
+    return { assignedPlayer: player.name, assignedPosition: null };
+};
+
+export default function createFieldingChart(players, innings = 7) {
+    const MAX_OUTS = (players.length > 12) ? 3 : 2;
+    const playersCopy = [...players];
+
+    // Loop through the number of innings
     for (let inning = 0; inning < innings; inning++) {
-        // Step 1: Handle previously out players
-        if (inning > 0) {
-            const previouslyOut = playerData.filter(
-                player => player.positions[inning - 1] === "Out"
+        let assignedPlayers = [];
+        let availablePositions = [...positions];
+        let outPreviousInning;
+
+        // Do this only if it's not the first inning
+        if (inning !== 0) {
+            // Find players out in the previous inning or who have met the max number of outs
+            outPreviousInning = players.filter(player =>
+                player.positions[inning - 1] === "Out" || countOutPositions(player) >= MAX_OUTS
             );
-            for (const player of previouslyOut) {
-                const preferredPosition = player.preferredPositions.find(pos =>
-                    !playerData.some(p => p.positions[inning] === pos)
-                );
-                if (preferredPosition) {
-                    assignPlayerToPosition(player, preferredPosition, inning, players.length);
-                }
-            }
         }
 
-        // Step 2: Fill preferred positions
-        let unfilledPositions = getUnfilledPositions(playerData, inning, positions);
-        for (const position of unfilledPositions) {
-            const availablePlayer = getUnassignedPlayers(playerData, inning)
-                .find(player => player.preferredPositions.includes(position));
-            if (availablePlayer) {
-                assignPlayerToPosition(availablePlayer, position, inning, players.length);
-            }
+        if (outPreviousInning?.length > 0) {
+            outPreviousInning.forEach(player => {
+                const { assignedPlayer, assignedPosition } = assignPosition(player, availablePositions);
+                assignedPlayers.push(assignedPlayer);
+                // Remove assignPosition from availablePositions
+                availablePositions = availablePositions.filter(pos => pos !== assignedPosition);
+            });
         }
 
-        // Step 3: Fill remaining field positions
-        unfilledPositions = getUnfilledPositions(playerData, inning, positions);
-        let unassignedPlayers = getUnassignedPlayers(playerData, inning);
+        availablePositions?.forEach(position => {
+            // Skip if no positions left to assign
+            if (availablePositions.length === 0) return;
 
-        unfilledPositions.forEach((position, index) => {
-            if (unassignedPlayers[index]) {
-                assignPlayerToPosition(unassignedPlayers[index], position, inning, players.length);
-            }
-        });
+            playersCopy.forEach(player => {
+                // Skip if player already assigned or no positions available
+                if (assignedPlayers.includes(player.name) || availablePositions.length === 0) return;
 
-        // Step 4: Assign "Out" positions based on count
-        unassignedPlayers = [...getUnassignedPlayers(playerData, inning)]
-            .sort((a, b) => countOutPositions(a) - countOutPositions(b));
-
-        for (const player of unassignedPlayers) {
-            if (!hasReachedOutLimit(player, players.length)) {
-                assignPlayerToPosition(player, "Out", inning, players.length);
-            }
-        }
-
-        // Step 5: Handle any remaining unassigned players
-        const remainingPlayers = getUnassignedPlayers(playerData, inning);
-        for (const player of remainingPlayers) {
-            const position = getUnfilledPositions(playerData, inning, positions)[0];
-            if (position) {
-                assignPlayerToPosition(player, position, inning, players.length);
-            } else {
-                // Only force "Out" if absolutely necessary
-                if (!hasReachedOutLimit(player, players.length)) {
-                    player.positions[inning] = "Out";
-                } else {
-                    // Find someone with fewer outs to swap with
-                    const swapCandidate = playerData.find(p =>
-                        p.positions[inning] === "Out" &&
-                        !hasReachedOutLimit(p, players.length)
-                    );
-                    if (swapCandidate) {
-                        swapCandidate.positions[inning] = player.positions[inning];
-                        player.positions[inning] = "Out";
+                if (player.preferredPositions.includes(position)) {
+                    const { assignedPlayer, assignedPosition } = assignPosition(player, availablePositions);
+                    // Only process successful assignments
+                    if (assignedPosition) {
+                        assignedPlayers.push(assignedPlayer);
+                        availablePositions = availablePositions.filter(pos => pos !== assignedPosition);
                     }
                 }
+            });
+        });
+
+        // Find players not assigned a position this inning
+
+        // Get list of unassigned players
+        const unassignedPlayers = playersCopy.filter(player => !assignedPlayers.includes(player.name));
+
+        // Sort unassigned players by number of "Out" positions (ascending)
+        unassignedPlayers.sort((a, b) => countOutPositions(a) - countOutPositions(b));
+
+        // Assign "Out" to players with fewer than MAX_OUTS
+        unassignedPlayers.forEach(player => {
+            if (countOutPositions(player) < MAX_OUTS) {
+                player.positions.push("Out");
+            } else {
+                // Try to find another position or handle this case
+                const { assignedPlayer, assignedPosition } = assignPosition(player, availablePositions);
+                if (assignedPosition) {
+                    assignedPlayers.push(assignedPlayer);
+                    availablePositions = availablePositions.filter(pos => pos !== assignedPosition);
+                }
             }
-        }
+        });
     }
 
-    return playerData;
-}
-
-export default createFieldingChart;
+    return playersCopy;
+};
