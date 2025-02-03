@@ -8,6 +8,7 @@
                 "First Base",
                 "Third Base"
             ],
+            "positions": [],
             "battingRating": 10,
             "fieldRating": 8,
             "gender": "male"
@@ -18,6 +19,7 @@
                 "Left Field",
                 "Left Center Field"
             ],
+            "positions": [],
             "battingRating": 8,
             "fieldRating": 10,
             "gender": "male"
@@ -29,6 +31,7 @@
                 "Left Field",
                 "Right Center Field"
             ],
+            "positions": [],
             "battingRating": 8,
             "fieldRating": 10,
             "gender": "male"
@@ -40,6 +43,7 @@
                 "Left Center Field",
                 "Right Center Field"
             ],
+            "positions": [],
             "battingRating": 7,
             "fieldRating": 8,
             "gender": "male"
@@ -50,6 +54,7 @@
                 "Right Center Field",
                 "Right Field"
             ],
+            "positions": [],
             "battingRating": 6,
             "fieldRating": 6,
             "gender": "male"
@@ -60,6 +65,7 @@
                 "Catcher",
                 "Second Base"
             ],
+            "positions": [],
             "battingRating": 1,
             "fieldRating": 1,
             "gender": "female"
@@ -70,6 +76,7 @@
                 "Right Field",
                 "Second Base"
             ],
+            "positions": [],
             "battingRating": 6,
             "fieldRating": 6,
             "gender": "female"
@@ -81,6 +88,7 @@
                 "Shortstop",
                 "Right Field"
             ],
+            "positions": [],
             "battingRating": 7,
             "fieldRating": 8,
             "gender": "female"
@@ -92,6 +100,7 @@
                 "Right Field",
                 "Right Center Field"
             ],
+            "positions": [],
             "battingRating": 7,
             "fieldRating": 9,
             "gender": "male"
@@ -103,6 +112,7 @@
                 "Shortstop",
                 "First Base"
             ],
+            "positions": [],
             "battingRating": 8,
             "fieldRating": 9,
             "gender": "male"
@@ -113,6 +123,7 @@
                 "Second Base",
                 "Right Field"
             ],
+            "positions": [],
             "battingRating": 5,
             "fieldRating": 5,
             "gender": "female"
@@ -124,6 +135,7 @@
                 "Right Center Field",
                 "Right Field"
             ],
+            "positions": [],
             "battingRating": 5,
             "fieldRating": 7,
             "gender": "male"
@@ -135,6 +147,7 @@
                 "Right Center Field",
                 "Right Field"
             ],
+            "positions": [],
             "battingRating": 6,
             "fieldRating": 8,
             "gender": "male"
@@ -145,6 +158,7 @@
                 "Catcher",
                 "Second Base"
             ],
+            "positions": [],
             "battingRating": 2,
             "fieldRating": 2,
             "gender": "female"

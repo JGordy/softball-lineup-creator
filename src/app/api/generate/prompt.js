@@ -1,6 +1,14 @@
-import positions from "./positions";
+import positions from "../../constants/positions";
 
 const prompt = `Fielding Positions: ${JSON.stringify(positions)}
+
+Inning #1: For each position find a player that has that position listed in thier preferredPositions list. Assign them to that position. Assign the rest of the players as "Out" for that inning.
+Inning #2: First look for players assigned "Out" in inning #1 and assign them a position according to their preferredPositions list. Then look through the remaining players and find positions for them as well.
+Inning #3: First look for players assigned "Out" in inning #2 and assign them a position according to their preferredPositions list. Then look through the remaining players and find positions for them as well.
+Inning #4: First look for players assigned "Out" in inning #3 and assign them a position according to their preferredPositions list. Then look through the remaining players and find positions for them as well.
+Inning #5: First look for players assigned "Out" in inning #4 and assign them a position according to their preferredPositions list. Then look through the remaining players and find positions for them as well.
+Inning #6: First look for players assigned "Out" in inning #5 and assign them a position according to their preferredPositions list. Then look through the remaining players and find positions for them as well.
+Inning #7: First look for players assigned "Out" in inning #6 and assign them a position according to their preferredPositions list. Then look through the remaining players and find positions for them as well.
 
 Rules:
 
@@ -23,32 +31,6 @@ If a player cannot be assigned a preferred position, assign them to the next ava
 "Out" Assignment Minimization:
 In each inning, prioritize assigning a valid position to players who were assigned "Out" in the previous inning. This helps distribute "Out" assignments more evenly across players.
 Each player should be assigned "Out" at least once to allow fair rotation of fielding positions for other players. As long as the other rules are met.
-
-Output:
-Return the updated player data in valid JSON format:
-
-[
-    {
-        "name": "Hayden",
-        "preferredPositions": [
-            "Left Center Field",
-            "Right Center Field",
-            "Right Field"
-        ],
-        "battingRating": 6,
-        "fieldRating": 8,
-        "gender": "male",
-        "positions": [
-            "Out",
-            "Left Center Field",
-            "Out",
-            "Left Center Field",
-            "Right Center Field",
-            "Right Field",
-            "Right Center Field"
-        ]
-    },
-  // ... other players
-]`;
+`;
 
 export default prompt;
