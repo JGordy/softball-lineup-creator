@@ -1,58 +1,39 @@
 "use client";
-import { useState } from "react";
-import { account, ID } from "./appwrite";
+import { useState, useEffect } from "react";
+import { account } from "./appwrite";
 
 import styles from './styles/page.module.css';
 
 const LoginPage = () => {
     const [loggedInUser, setLoggedInUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-    });
+    useEffect(() => {
+        const getUserAccount = async () => {
+            try {
+                const session = await account.getSession('current');
+                if (session) {
+                    const user = await account.get();
+                    setLoggedInUser(user);
+                }
+            } catch (error) {
+                console.log("No active session found");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const [name, setName] = useState("");
-
-    const login = async () => {
-        const { email, password } = formData;
-        try {
-            await account.createEmailPasswordSession(email, password);
-            setLoggedInUser(await account.get());
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const register = async () => {
-        const { email, password } = formData;
-        try {
-            await account.create(ID.unique(), email, password, name);
-            await login(email, password);
-
-            await account.createVerification('http://localhost:3000/verify');
-        } catch (error) {
-            console.log(error);
-        }
-    };
+        getUserAccount();
+    }, []);
 
     const logout = async () => {
         await account.deleteSession("current");
         setLoggedInUser(null);
     };
 
-    const handleInputChange = (e) => {
-        const { type, value } = e.target;
-
-        if (type === "text") {
-            setName(value);
-        } else {
-            setFormData({
-                ...formData,
-                [type]: value,
-            });
-        }
-    };
+    if (loading) {
+        return <main className={styles.main}>Loading...</main>;
+    }
 
     if (loggedInUser) {
         return (
@@ -72,43 +53,6 @@ const LoginPage = () => {
     return (
         <main className={styles.main}>
             <p>Not logged in</p>
-            <form className={styles.form}>
-                <input
-                    className={styles.input}
-                    type="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                />
-                <input
-                    className={styles.input}
-                    type="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                />
-                <input
-                    className={styles.input}
-                    type="text"
-                    placeholder="Name"
-                    value={name}
-                    onChange={handleInputChange}
-                />
-                <button
-                    className={styles.button}
-                    type="button"
-                    onClick={login}
-                >
-                    Login
-                </button>
-                <button
-                    className={styles.button}
-                    type="button"
-                    onClick={register}
-                >
-                    Register
-                </button>
-            </form>
         </main>
     );
 };

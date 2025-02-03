@@ -5,7 +5,7 @@ import styles from '../../styles/page.module.css';
 import lineupStyles from './lineup.module.css';
 
 import createBattingOrder from '../../utils/createBattingOrder';
-import createFieldingChart from '../../utils/createFieldingChart';
+import createFieldingChart from '../../utils/createFieldingChartV2';
 import PlayerChart from '../../components/PlayerChart';
 
 const GameDay = () => {
